@@ -108,11 +108,7 @@ ASSET_FILES_OUT := $(foreach f,$(ASSET_FILES_XML:.xml=.c),$f) \
 				   $(foreach f,$(wildcard assets/text/*.c),build/$(f:.c=.o))
 
 # source files
-C_FILES       := $(foreach dir,$(SRC_DIRS) $(ASSET_BIN_DIRS),$(wildcard $(dir)/*.c))
-S_FILES       := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.s))
-O_FILES       := $(foreach f,$(S_FILES:.s=.o),build/$f) \
-                 $(foreach f,$(C_FILES:.c=.o),build/$f) \
-                 $(foreach f,$(wildcard baserom/*),build/$f.o)
+O_FILES       := $(shell cat $(SPEC) | grep '^.*".*\.o"$$' | awk '{ gsub(/"/, "", $$2); print $$2 }' | grep -v '^.*_reloc.o$$' | sort -u)
 
 # Automatic dependency files
 # (Only asm_processor dependencies are handled for now)
