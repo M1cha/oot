@@ -1,0 +1,4 @@
+cat spec | grep '^\s*name ".*"$' | awk '{ gsub(/"/, "", $2); print "int _" $2 "SegmentRomStart;" }' > src/fakesyms.c
+cat spec | grep '^\s*name ".*"$' | awk '{ gsub(/"/, "", $2); print "int _" $2 "SegmentRomEnd;" }' >> src/fakesyms.c
+cat spec | grep '^\s*name ".*"$' | awk '{ gsub(/"/, "", $2); print "int _" $2 "SegmentStart;" }' >> src/fakesyms.c
+cat spec | grep '^\s*name ".*"$' | awk '{ gsub(/"/, "", $2); print "int _" $2 "SegmentEnd;" }' >> src/fakesyms.c

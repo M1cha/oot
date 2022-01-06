@@ -1149,7 +1149,6 @@ void Gameplay_Draw(GlobalContext* globalCtx) {
                                 gZBuffer);
 
             if (R_PAUSE_MENU_MODE == 2) {
-                MsgEvent_SendNullTask();
                 PreRender_Calc(&globalCtx->pauseBgPreRender);
                 R_PAUSE_MENU_MODE = 3;
             } else if (R_PAUSE_MENU_MODE >= 4) {
@@ -1433,6 +1432,7 @@ f32 func_800BFCB8(GlobalContext* globalCtx, MtxF* mf, Vec3f* vec) {
 }
 
 void* Gameplay_LoadFile(GlobalContext* globalCtx, RomFile* file) {
+    return file->vromStart;
     u32 size;
     void* allocp;
 

@@ -38,6 +38,7 @@ void Font_LoadOrderedFont(Font* font) {
     s32 fontBufIndex;
     s32 offset;
 
+    return;
     font->msgOffset = _message_0xFFFC_nes - (const char*)_nes_message_data_staticSegmentStart;
     len = font->msgLength = _message_0xFFFD_nes - _message_0xFFFC_nes;
 

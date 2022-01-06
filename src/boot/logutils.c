@@ -92,9 +92,6 @@ void LogUtils_CheckNullPointer(const char* exp, void* ptr, const char* file, s32
 }
 
 void LogUtils_CheckValidPointer(const char* exp, void* ptr, const char* file, s32 line) {
-    if (ptr == NULL || (u32)ptr < 0x80000000 || (0x80000000 + osMemSize) <= (u32)ptr) {
-        osSyncPrintf(VT_COL(RED, WHITE) "%s %d:ポインタ %s(%08x) が異常です\n" VT_RST, file, line, exp, ptr);
-    }
 }
 
 void LogUtils_LogThreadId(const char* name, s32 line) {

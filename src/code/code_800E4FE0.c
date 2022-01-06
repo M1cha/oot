@@ -389,6 +389,7 @@ void Audio_QueueCmdU16(u32 opArgs, u16 data) {
 }
 
 s32 Audio_ScheduleProcessCmds(void) {
+    return 0;
     static s32 D_801304E8 = 0;
     s32 ret;
 

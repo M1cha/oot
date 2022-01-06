@@ -1,14 +1,10 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-#include "z64.h"
+#include <string.h>
+#include <math.h>
 
-f32 fabsf(f32 f);
-#pragma intrinsic(fabsf)
-f32 sqrtf(f32 f);
-#pragma intrinsic(sqrtf)
-f64 sqrt(f64 d);
-#pragma intrinsic(sqrt)
+#include "z64.h"
 
 void cleararena(void);
 void bootproc(void);
@@ -107,9 +103,6 @@ void osSetEventMesg(OSEvent e, OSMesgQueue* mq, OSMesg msg);
 s32 _Printf(PrintCallback, void* arg, const char* fmt, va_list ap);
 void osUnmapTLBAll(void);
 s32 osEPiStartDma(OSPiHandle* handle, OSIoMesg* mb, s32 direction);
-const char* strchr(const char* str, s32 ch);
-u32 strlen(const char* str);
-void* memcpy(void* dst, const void* src, u32 size);
 void osInvalICache(void* vaddr, s32 nbytes);
 void osCreateMesgQueue(OSMesgQueue* mq, OSMesg* msg, s32 count);
 void osInvalDCache(void* vaddr, s32 nbytes);
@@ -120,7 +113,6 @@ OSPri osGetThreadPri(OSThread* thread);
 s32 __osEPiRawReadIo(OSPiHandle* handle, u32 devAddr, u32* data);
 void osViSwapBuffer(void* vaddr);
 s32 __osEPiRawStartDma(OSPiHandle* handle, s32 direction, u32 cartAddr, void* dramAddr, size_t size);
-u32 bcmp(void* __sl, void* __s2, u32 __n);
 OSTime osGetTime(void);
 void __osTimerServicesInit(void);
 void __osTimerInterrupt(void);
@@ -129,7 +121,6 @@ OSTime __osInsertTimer(OSTimer* timer);
 u32 osGetCount(void);
 void __osSetGlobalIntMask(OSHWIntr mask);
 void __osSetCompare(u32);
-void* bcopy(void* __src, void* __dest, u32 __n);
 void __osResetGlobalIntMask(OSHWIntr mask);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
@@ -147,8 +138,6 @@ void osYieldThread(void);
 u32 __osGetCause();
 s32 __osEPiRawWriteIo(OSPiHandle* handle, u32 devAddr, u32 data);
 void _Litob(_Pft* args, u8 type);
-ldiv_t ldiv(s32 num, s32 denom);
-lldiv_t lldiv(s64 num, s64 denom);
 void _Ldtob(_Pft* args, u8 type);
 s32 __osSiRawWriteIo(void* devAddr, u32 val);
 void osCreateViManager(OSPri pri);

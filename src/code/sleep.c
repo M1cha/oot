@@ -1,28 +1,41 @@
 #include "global.h"
+#include <unistd.h>
+#include <errno.h>
+#include <time.h>
 
-void Sleep_Cycles(OSTime cycles) {
-    OSMesgQueue mq;
-    OSMesg msg;
-    OSTimer timer;
-
-    osCreateMesgQueue(&mq, &msg, OS_MESG_BLOCK);
-    osSetTimer(&timer, cycles, 0, &mq, NULL);
-    osRecvMesg(&mq, NULL, OS_MESG_BLOCK);
-}
-
+// TODO: use clock_nanosleep
 void Sleep_Nsec(u32 nsec) {
-    Sleep_Cycles(OS_NSEC_TO_CYCLES(nsec));
+    struct timespec ts;
+    struct timespec ts_rem;
+    int ret;
+
+    ts.tv_sec = 0;
+    ts.tv_nsec = nsec;
+
+    while (ts.tv_nsec) {
+        ret = nanosleep(&ts, &ts_rem);
+        if (ret < 0) {
+            if (errno == EINTR) {
+                ts = ts_rem;
+                continue;
+            }
+
+            abort();
+        }
+
+        break;
+    }
 }
 
 void Sleep_Usec(u32 usec) {
-    Sleep_Cycles(OS_USEC_TO_CYCLES(usec));
+    usleep(usec);
 }
 
 // originally "msleep"
 void Sleep_Msec(u32 ms) {
-    Sleep_Cycles((ms * OS_CPU_COUNTER) / 1000ull);
+    Sleep_Usec(ms * 1000);
 }
 
 void Sleep_Sec(u32 sec) {
-    Sleep_Cycles(sec * OS_CPU_COUNTER);
+    sleep(sec);
 }

@@ -33,19 +33,19 @@ char D_80133390[] = "SEQ H";
 char D_80133398[] = "    L";
 
 // bss
-extern SoundRequest sSoundRequests[0x100];
-extern SoundBankEntry D_8016BAD0[9];
-extern SoundBankEntry D_8016BC80[12];
-extern SoundBankEntry D_8016BEC0[22];
-extern SoundBankEntry D_8016C2E0[20];
-extern SoundBankEntry D_8016C6A0[8];
-extern SoundBankEntry D_8016C820[3];
-extern SoundBankEntry D_8016C8B0[5];
-extern u8 sSoundBankListEnd[7];
-extern u8 sSoundBankFreeListStart[7];
-extern u8 sSoundBankUnused[7];
-extern u8 sCurSfxPlayerChannelIdx;
-extern UnusedBankLerp sUnusedBankLerp[7];
+SoundRequest sSoundRequests[0x100];
+SoundBankEntry D_8016BAD0[9];
+SoundBankEntry D_8016BC80[12];
+SoundBankEntry D_8016BEC0[22];
+SoundBankEntry D_8016C2E0[20];
+SoundBankEntry D_8016C6A0[8];
+SoundBankEntry D_8016C820[3];
+SoundBankEntry D_8016C8B0[5];
+u8 sSoundBankListEnd[7];
+u8 sSoundBankFreeListStart[7];
+u8 sSoundBankUnused[7];
+u8 sCurSfxPlayerChannelIdx;
+UnusedBankLerp sUnusedBankLerp[7];
 
 // data
 
@@ -331,6 +331,7 @@ void Audio_RemoveSoundBankEntry(u8 bankId, u8 entryIndex) {
 }
 
 void Audio_ChooseActiveSounds(u8 bankId) {
+    return;
     u8 numChosenSounds;
     u8 numChannels;
     u8 entryIndex;
@@ -487,6 +488,7 @@ void Audio_ChooseActiveSounds(u8 bankId) {
 }
 
 void Audio_PlayActiveSounds(u8 bankId) {
+    return;
     u8 entryIndex;
     SequenceChannel* channel;
     SoundBankEntry* entry;
@@ -547,6 +549,7 @@ void Audio_PlayActiveSounds(u8 bankId) {
 }
 
 void Audio_StopSfxByBank(u8 bankId) {
+    return;
     SoundBankEntry* entry;
     s32 pad;
     SoundBankEntry cmp;

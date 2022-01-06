@@ -1,10 +1,5 @@
 .include "macro.inc"
 
-# assembler directives
-.set noat      # allow manual use of $at
-.set noreorder # don't insert nops after branches
-.set gp=64     # allow use of 64-bit general purpose registers
-
 .section .data
 
 .balign 16
@@ -64,41 +59,4 @@ glabel D_80133738
     .incbin "baserom.z64", 0xBAA8D8, 0x90
 
 glabel gAudioSpecs
-    .incbin "baserom.z64", 0xBAA968, 0xC
-    .word D_80133420
-    .incbin "baserom.z64", 0xBAA978, 0x34
-    .word D_80133468
-    .incbin "baserom.z64", 0xBAA9B0, 0x34
-    .word D_801334B0
-    .incbin "baserom.z64", 0xBAA9E8, 0x34
-    .word D_80133540
-    .incbin "baserom.z64", 0xBAAA20, 0x34
-    .word D_80133588
-    .incbin "baserom.z64", 0xBAAA58, 0x34
-    .word D_801335D0
-    .incbin "baserom.z64", 0xBAAA90, 0x34
-    .word D_80133618
-    .incbin "baserom.z64", 0xBAAAC8, 0x34
-    .word D_80133660
-    .incbin "baserom.z64", 0xBAAB00, 0x34
-    .word D_801336A8
-    .incbin "baserom.z64", 0xBAAB38, 0x34
-    .word D_80133660
-    .incbin "baserom.z64", 0xBAAB70, 0x34
-    .word D_801336F0
-    .incbin "baserom.z64", 0xBAABA8, 0x34
-    .word D_80133738
-    .incbin "baserom.z64", 0xBAABE0, 0x34
-    .word D_80133738
-    .incbin "baserom.z64", 0xBAAC18, 0x34
-    .word D_80133420
-    .incbin "baserom.z64", 0xBAAC50, 0x34
-    .word D_80133660
-    .incbin "baserom.z64", 0xBAAC88, 0x34
-    .word D_80133420
-    .incbin "baserom.z64", 0xBAACC0, 0x34
-    .word D_80133420
-    .incbin "baserom.z64", 0xBAACF8, 0x34
-    .word D_801334B0
-    .incbin "baserom.z64", 0xBAAD30, 0x30
     

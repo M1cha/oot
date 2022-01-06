@@ -36,7 +36,7 @@ const ActorInit Bg_Mjin_InitVars = {
     NULL,
 };
 
-extern UNK_TYPE D_06000000;
+UNK_TYPE D_06000000;
 
 static InitChainEntry sInitChain[] = {
     ICHAIN_VEC3F_DIV1000(scale, 1000, ICHAIN_CONTINUE),

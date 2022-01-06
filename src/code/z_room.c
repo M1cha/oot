@@ -352,7 +352,7 @@ void func_80096680(GlobalContext* globalCtx, Room* room, u32 flags) {
             }
 
             // gSPLoadUcode(POLY_OPA_DISP++, SysUcode_GetUCode(), SysUcode_GetUCodeData())?
-            gSPLoadUcodeEx(POLY_OPA_DISP++, SysUcode_GetUCode(), SysUcode_GetUCodeData(), 0x800);
+            //gSPLoadUcodeEx(POLY_OPA_DISP++, SysUcode_GetUCode(), SysUcode_GetUCodeData(), 0x800);
         }
     }
 
@@ -434,7 +434,7 @@ void func_80096B6C(GlobalContext* globalCtx, Room* room, u32 flags) {
 
         if (sp94) {
             // gSPLoadUcodeL(POLY_OPA_DISP++, rspS2DEX)?
-            gSPLoadUcodeEx(POLY_OPA_DISP++, OS_K0_TO_PHYSICAL(D_80113070), OS_K0_TO_PHYSICAL(D_801579A0), 0x800);
+            //gSPLoadUcodeEx(POLY_OPA_DISP++, OS_K0_TO_PHYSICAL(D_80113070), OS_K0_TO_PHYSICAL(D_801579A0), 0x800);
 
             {
                 Vec3f sp5C;

@@ -5,7 +5,7 @@
 #define DLSIZE (1 + 3 + 1 + 1 + 80 * (7 + 2 + 2 + 3) + 1)
 
 // framebuffer
-extern u16 D_0F000000[];
+u16 D_0F000000[8*1024*1024];
 
 void VisMono_Init(VisMono* this) {
     bzero(this, sizeof(VisMono));

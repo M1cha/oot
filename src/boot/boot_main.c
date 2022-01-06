@@ -10,7 +10,7 @@ void cleararena(void) {
     bzero(_dmadataSegmentStart, osMemSize - OS_K0_TO_PHYSICAL(_dmadataSegmentStart));
 }
 
-void bootproc(void) {
+int main(void) {
     StackCheck_Init(&sBootThreadInfo, sBootThreadStack, sBootThreadStack + sizeof(sBootThreadStack), 0, -1, "boot");
 
     osMemSize = osGetMemSize();
@@ -27,4 +27,6 @@ void bootproc(void) {
     osCreateThread(&sIdleThread, 1, Idle_ThreadEntry, NULL, sIdleThreadStack + sizeof(sIdleThreadStack),
                    Z_PRIORITY_MAIN);
     osStartThread(&sIdleThread);
+
+    return 0;
 }

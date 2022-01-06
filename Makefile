@@ -2,17 +2,12 @@ MAKEFLAGS += --no-builtin-rules
 
 # Build options can either be changed by modifying the makefile, or by building with 'make SETTING=value'
 
-# If COMPARE is 1, check the output md5sum after building
-COMPARE ?= 1
 # If NON_MATCHING is 1, define the NON_MATCHING C flag when building
-NON_MATCHING ?= 0
-# If ORIG_COMPILER is 1, compile with QEMU_IRIX and the original compiler
-ORIG_COMPILER ?= 0
+NON_MATCHING ?= 1
 
 ifeq ($(NON_MATCHING),1)
   CFLAGS := -DNON_MATCHING
   CPPFLAGS := -DNON_MATCHING
-  COMPARE := 0
 endif
 
 PROJECT_DIR := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
@@ -34,67 +29,34 @@ else
     endif
 endif
 
-#### Tools ####
-ifeq ($(shell type mips-linux-gnu-ld >/dev/null 2>/dev/null; echo $$?), 0)
-  MIPS_BINUTILS_PREFIX := mips-linux-gnu-
-else
-  $(error Please install or build mips-linux-gnu)
-endif
-
-CC       := tools/ido_recomp/$(DETECTED_OS)/7.1/cc
-CC_OLD   := tools/ido_recomp/$(DETECTED_OS)/5.3/cc
-
-# if ORIG_COMPILER is 1, check that either QEMU_IRIX is set or qemu-irix package installed
-ifeq ($(ORIG_COMPILER),1)
-  ifndef QEMU_IRIX
-    QEMU_IRIX := $(shell which qemu-irix)
-    ifeq (, $(QEMU_IRIX))
-      $(error Please install qemu-irix package or set QEMU_IRIX env var to the full qemu-irix binary path)
-    endif
-  endif
-  CC        = $(QEMU_IRIX) -L tools/ido7.1_compiler tools/ido7.1_compiler/usr/bin/cc
-  CC_OLD    = $(QEMU_IRIX) -L tools/ido5.3_compiler tools/ido5.3_compiler/usr/bin/cc
-endif
-
-AS         := $(MIPS_BINUTILS_PREFIX)as
-LD         := $(MIPS_BINUTILS_PREFIX)ld
-OBJCOPY    := $(MIPS_BINUTILS_PREFIX)objcopy
-OBJDUMP    := $(MIPS_BINUTILS_PREFIX)objdump
-EMULATOR = mupen64plus
-EMU_FLAGS = --noosd
+CC       := $(CROSS_COMPILE)cc
+AS         := $(CROSS_COMPILE)as
+LD         := $(CROSS_COMPILE)ld
+OBJCOPY    := $(CROSS_COMPILE)objcopy
+OBJDUMP    := $(CROSS_COMPILE)objdump
 
 INC        := -Iinclude -Isrc -Iassets -Ibuild -I.
 
-# Check code syntax with host compiler
 CHECK_WARNINGS := -Wall -Wextra -Wno-format-security -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-variable -Wno-missing-braces -Wno-int-conversion
-CC_CHECK   := gcc -fno-builtin -fsyntax-only -fsigned-char -std=gnu90 -D _LANGUAGE_C -D NON_MATCHING $(INC) $(CHECK_WARNINGS)
 
 CPP        := cpp
 MKLDSCRIPT := tools/mkldscript
 MKDMADATA  := tools/mkdmadata
-ELF2ROM    := tools/elf2rom
 ZAPD       := tools/ZAPD/ZAPD.out
 
-OPTFLAGS := -O2
-ASFLAGS := -march=vr4300 -32 -Iinclude
-MIPS_VERSION := -mips2
+OPTFLAGS := -Og
+ASFLAGS := -march=i386 --32 -Iinclude
+CFLAGS += -fno-builtin -fsigned-char -std=gnu90 -D _LANGUAGE_C -D NON_MATCHING $(INC) $(CHECK_WARNINGS) -g
+LDFLAGS += -lm
 
-# we support Microsoft extensions such as anonymous structs, which the compiler does support but warns for their usage. Surpress the warnings with -woff.
-CFLAGS += -G 0 -non_shared -Xfullwarn -Xcpluscomm $(INC) -Wab,-r4300_mul -woff 649,838,712
-
-ifeq ($(shell getconf LONG_BIT), 32)
-  # Work around memory allocation bug in QEMU
-  export QEMU_GUEST_BASE := 1
-else
+ifneq ($(shell getconf LONG_BIT), 32)
   # Ensure that gcc treats the code as 32-bit
-  CC_CHECK += -m32
+  CFLAGS += -m32
 endif
 
 #### Files ####
 
-# ROM image
-ROM := zelda_ocarina_mq_dbg.z64
-ELF := $(ROM:.z64=.elf)
+ELF := build/zelda_ocarina_mq_dbg.elf
 # description of ROM segments
 SPEC := spec
 
@@ -108,7 +70,7 @@ ASSET_FILES_OUT := $(foreach f,$(ASSET_FILES_XML:.xml=.c),$f) \
 				   $(foreach f,$(wildcard assets/text/*.c),build/$(f:.c=.o))
 
 # source files
-O_FILES       := $(shell cat $(SPEC) | grep '^.*".*\.o"$$' | awk '{ gsub(/"/, "", $$2); print $$2 }' | grep -v '^.*_reloc.o$$' | sort -u)
+O_FILES       := $(shell cat $(SPEC) | grep '^.*".*\.o"$$' | awk '{ gsub(/"/, "", $$2); print $$2 }' | sort -u)
 
 # Automatic dependency files
 # (Only asm_processor dependencies are handled for now)
@@ -122,9 +84,7 @@ TEXTURE_FILES_OUT := $(foreach f,$(TEXTURE_FILES_PNG:.png=.inc.c),build/$f) \
 # create build directories
 $(shell mkdir -p build/baserom build/assets/text $(foreach dir,$(SRC_DIRS) $(ASM_DIRS) $(ASSET_BIN_DIRS),build/$(dir)))
 
-build/src/code/fault.o: CFLAGS += -trapuv
 build/src/code/fault.o: OPTFLAGS := -O2 -g3
-build/src/code/fault_drawer.o: CFLAGS += -trapuv
 build/src/code/fault_drawer.o: OPTFLAGS := -O2 -g3
 build/src/code/ucode_disas.o: OPTFLAGS := -O2 -g3
 build/src/code/code_801068B0.o: OPTFLAGS := -g
@@ -134,9 +94,7 @@ build/src/code/code_801067F0.o: OPTFLAGS := -g
 build/src/libultra/libc/absf.o: OPTFLAGS := -O2 -g3
 build/src/libultra/libc/sqrt.o: OPTFLAGS := -O2 -g3
 build/src/libultra/libc/ll.o: OPTFLAGS := -O1
-build/src/libultra/libc/ll.o: MIPS_VERSION := -mips3 -32
 build/src/libultra/libc/llcvt.o: OPTFLAGS := -O1
-build/src/libultra/libc/llcvt.o: MIPS_VERSION := -mips3 -32
 
 build/src/libultra/os/%.o: OPTFLAGS := -O1
 build/src/libultra/io/%.o: OPTFLAGS := -O2
@@ -144,34 +102,12 @@ build/src/libultra/libc/%.o: OPTFLAGS := -O2
 build/src/libultra/rmon/%.o: OPTFLAGS := -O2
 build/src/libultra/gu/%.o: OPTFLAGS := -O2
 
-build/src/libultra/gu/%.o: CC := $(CC_OLD)
-build/src/libultra/io/%.o: CC := $(CC_OLD)
-build/src/libultra/libc/%.o: CC := $(CC_OLD)
-build/src/libultra/os/%.o: CC := $(CC_OLD)
-build/src/libultra/rmon/%.o: CC := $(CC_OLD)
-
-build/src/code/jpegutils.o: CC := $(CC_OLD)
-build/src/code/jpegdecoder.o: CC := $(CC_OLD)
-
-build/src/boot/%.o: CC := python3 tools/asm_processor/build.py $(CC) -- $(AS) $(ASFLAGS) --
-build/src/code/%.o: CC := python3 tools/asm_processor/build.py $(CC) -- $(AS) $(ASFLAGS) --
-build/src/overlays/%.o: CC := python3 tools/asm_processor/build.py $(CC) -- $(AS) $(ASFLAGS) --
-
-build/assets/%.o: CC := python3 tools/asm_processor/build.py $(CC) -- $(AS) $(ASFLAGS) --
-
 #### Main Targets ###
 
-all: $(ROM)
-ifeq ($(COMPARE),1)
-	@md5sum $(ROM)
-	@md5sum -c checksum.md5
-endif
-
-$(ROM): $(ELF)
-	$(ELF2ROM) -cic 6105 $< $@
+all: $(ELF)
 
 $(ELF): $(TEXTURE_FILES_OUT) $(ASSET_FILES_OUT) $(O_FILES) build/ldscript.txt build/undefined_syms.txt
-	$(LD) -T build/undefined_syms.txt -T build/ldscript.txt --no-check-sections --accept-unknown-input-arch --emit-relocs -Map build/z64.map -o $@
+	@$(CC) $(CFLAGS) -Wl,-T build/ldscript.txt -Wl,--no-check-sections -Wl,--accept-unknown-input-arch -Wl,-Map,build/z64.map -o $@ $(LDFLAGS)
 
 build/$(SPEC): $(SPEC)
 	$(CPP) $(CPPFLAGS) $< > $@
@@ -183,7 +119,7 @@ build/undefined_syms.txt: undefined_syms.txt
 	$(CPP) $(CPPFLAGS) $< > build/undefined_syms.txt
 
 clean:
-	$(RM) -r $(ROM) $(ELF) build
+	$(RM) -r $(ELF) build
 
 assetclean:
 	$(RM) -r $(ASSET_BIN_DIRS)
@@ -202,8 +138,6 @@ setup:
 	python3 extract_assets.py
 
 resources: $(ASSET_FILES_OUT)
-test: $(ROM)
-	$(EMULATOR) $(EMU_FLAGS) $<
 
 .PHONY: all clean setup test distclean assetclean
 
@@ -227,7 +161,7 @@ build/assets/text/nes_message_data_static.o: build/assets/text/message_data.enc.
 build/assets/text/staff_message_data_static.o: build/assets/text/message_data_staff.enc.h
 
 build/assets/%.o: assets/%.c
-	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
 
 build/dmadata_table_spec.h: build/$(SPEC)
 	$(MKDMADATA) $< $@
@@ -236,24 +170,18 @@ build/src/boot/z_std_dma.o: build/dmadata_table_spec.h
 build/src/dmadata/dmadata.o: build/dmadata_table_spec.h
 
 build/src/overlays/%.o: src/overlays/%.c
-	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
-	$(CC_CHECK) $<
-	$(ZAPD) bovl -eh -i $@ -cfg $< --outputpath $(@D)/$(notdir $(@D))_reloc.s
-	-test -f $(@D)/$(notdir $(@D))_reloc.s && $(AS) $(ASFLAGS) $(@D)/$(notdir $(@D))_reloc.s -o $(@D)/$(notdir $(@D))_reloc.o
+	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
+#	$(ZAPD) bovl -eh -i $@ -cfg $< --outputpath $(@D)/$(notdir $(@D))_reloc.s
+#	-test -f $(@D)/$(notdir $(@D))_reloc.s && $(AS) $(ASFLAGS) $(@D)/$(notdir $(@D))_reloc.s -o $(@D)/$(notdir $(@D))_reloc.o
 
 build/src/%.o: src/%.c
-	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
-	$(CC_CHECK) $<
+	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
 
 build/src/libultra/libc/ll.o: src/libultra/libc/ll.c
-	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
-	$(CC_CHECK) $<
-	python3 tools/set_o32abi_bit.py $@
+	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
 
 build/src/libultra/libc/llcvt.o: src/libultra/libc/llcvt.c
-	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
-	$(CC_CHECK) $<
-	python3 tools/set_o32abi_bit.py $@
+	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
 
 build/%.inc.c: %.png
 	$(ZAPD) btex -eh -tt $(subst .,,$(suffix $*)) -i $< -o $@

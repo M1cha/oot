@@ -17,18 +17,14 @@ static void write_ld_script(FILE *fout)
     int i;
     int j;
 
-    fputs("SECTIONS {\n"
-          "    _RomSize = 0;\n"
-          "    _RomStart = _RomSize;\n\n",
-          fout);
+    fputs(
+//          "PHDRS { n64 PT_LOAD ; text PT_LOAD ; }\n"
+          "SECTIONS {\n"
+          ,fout);
 
     for (i = 0; i < g_segmentsCount; i++)
     {
         const struct Segment *seg = &g_segments[i];
-
-        // align start of ROM segment
-        if (seg->fields & (1 << STMT_romalign))
-            fprintf(fout, "    _RomSize = (_RomSize + %i) & ~ %i;\n", seg->romalign - 1, seg->romalign - 1);
 
         // initialized data (.text, .data, .rodata, .sdata)
 
@@ -36,19 +32,12 @@ static void write_ld_script(FILE *fout)
         //if (seg->fields & (1 << STMT_increment))
             //fprintf(fout, "    . += 0x%08X;\n", seg->increment);
 
-        fprintf(fout, "    _%sSegmentRomStartTemp = _RomSize;\n"
-                  "    _%sSegmentRomStart = _%sSegmentRomStartTemp;\n"
+        fprintf(fout, 
+                  "    _%sSegmentRomStart = .;\n"
                   "    ..%s ", seg->name, seg->name, seg->name, seg->name);
 
-        if (seg->fields & (1 << STMT_after))
-            fprintf(fout, "_%sSegmentEnd ", seg->after);
-        else if (seg->fields & (1 << STMT_number))
-            fprintf(fout, "0x%02X000000 ", seg->number);
-        else if (seg->fields & (1 << STMT_address))
-            fprintf(fout, "0x%08X ", seg->address);
-
         // (AT(_RomSize) isn't necessary, but adds useful "load address" lines to the map file)
-        fprintf(fout, ": AT(_RomSize)\n    {\n"
+        fprintf(fout, "  :  {\n"
                   "        _%sSegmentStart = .;\n"
                   "        . = ALIGN(0x10);\n"
                   "        _%sSegmentTextStart = .;\n",
@@ -59,7 +48,7 @@ static void write_ld_script(FILE *fout)
 
         for (j = 0; j < seg->includesCount; j++)
         {
-            fprintf(fout, "            %s (.text)\n", seg->includes[j].fpath);
+            fprintf(fout, "            %s (.text .text.*)\n", seg->includes[j].fpath);
             if (seg->includes[j].linkerPadding != 0)
                 fprintf(fout, "            . += 0x%X;\n", seg->includes[j].linkerPadding);
         }
@@ -73,7 +62,7 @@ static void write_ld_script(FILE *fout)
         for (j = 0; j < seg->includesCount; j++)
         {
             if (!seg->includes[j].dataWithRodata)
-                fprintf(fout, "            %s (.data)\n", seg->includes[j].fpath);
+                fprintf(fout, "            %s (.data .data.*)\n", seg->includes[j].fpath);
         }
 
         /*
@@ -94,8 +83,8 @@ static void write_ld_script(FILE *fout)
         for (j = 0; j < seg->includesCount; j++)
         {
             if (seg->includes[j].dataWithRodata)
-                fprintf(fout, "            %s (.data)\n", seg->includes[j].fpath);
-            fprintf(fout, "            %s (.rodata)\n", seg->includes[j].fpath);
+                fprintf(fout, "            %s (.data .data.*)\n", seg->includes[j].fpath);
+            fprintf(fout, "            %s (.rodata .rodata.*)\n", seg->includes[j].fpath);
             // Compilers other than IDO, such as GCC, produce different sections such as
             // the ones named directly below. These sections do not contain values that
             // need relocating, but we need to ensure that the base .rodata section
@@ -138,16 +127,10 @@ static void write_ld_script(FILE *fout)
         
 
         fputs("    }\n", fout);
-        //fprintf(fout, "    _RomSize += ( _%sSegmentDataEnd - _%sSegmentTextStart );\n", seg->name, seg->name);
-        fprintf(fout, "    _RomSize += ( _%sSegmentOvlEnd - _%sSegmentTextStart );\n", seg->name, seg->name);
 
-        fprintf(fout, "    _%sSegmentRomEndTemp = _RomSize;\n"
-                  "_%sSegmentRomEnd = _%sSegmentRomEndTemp;\n\n",
+        fprintf(fout, 
+                  "_%sSegmentRomEnd = .;\n\n",
                   seg->name, seg->name, seg->name);
-
-        // algn end of ROM segment
-        if (seg->fields & (1 << STMT_romalign))
-            fprintf(fout, "    _RomSize = (_RomSize + %i) & ~ %i;\n", seg->romalign - 1, seg->romalign - 1);
 
         // uninitialized data (.sbss, .scommon, .bss, COMMON)
         fprintf(fout, "    ..%s.bss ADDR(..%s) + SIZEOF(..%s) (NOLOAD) :\n"
@@ -194,7 +177,7 @@ static void write_ld_script(FILE *fout)
     }
 
 
-    fputs("    _RomEnd = _RomSize;\n}\n", fout);
+    fputs("    \n} INSERT AFTER .text\n", fout);
 }
 
 static void usage(const char *execname)

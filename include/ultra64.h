@@ -4,11 +4,17 @@
 #include "ultra64/types.h"
 #include "unk.h"
 
-#include "libc/stdarg.h"
-#include "libc/stdbool.h"
-#include "libc/stddef.h"
-#include "libc/stdlib.h"
-#include "libc/math.h"
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <math.h>
+#include <limits.h>
+#include <float.h>
+
+#define SHT_MAX 32767.0f
+#define SHT_MINV (1.0f / SHT_MAX)
+#define DEGTORAD(x) (x * M_PI / 180.0f)
 
 #include "ultra64/exception.h"
 #include "ultra64/rcp.h"

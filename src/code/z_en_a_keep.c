@@ -52,7 +52,7 @@ static ColliderCylinderInit sCylinderInit = {
     { 25, 60, 0, { 0, 0, 0 } },
 };
 
-extern CollisionHeader D_06000730; // gHookshotTargetCol ?
+CollisionHeader D_06000730; // gHookshotTargetCol ?
 
 static CollisionHeader* sColHeaders[] = {
     &gLargerCubeCol,       // A_OBJ_GRASS_CLUMP, A_OBJ_TREE_STUMP

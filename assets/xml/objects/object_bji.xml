@@ -19,9 +19,7 @@
         <Limb Name="object_bji_Limb_0000A8" LimbType="Standard" Offset="0xA8"/>
         -->
 
-        <!-- 
         <Skeleton Name="object_bji_Skel_0000F0" Type="Flex" LimbType="Standard" Offset="0xF0"/>
-        -->
 
         <!-- 32-bit aligned textures. -->
         <!--

@@ -10,13 +10,7 @@ void Overlay_LoadGameState(GameStateOverlay* overlayEntry) {
     if (overlayEntry->vramStart == 0) {
         overlayEntry->unk_28 = 0;
     } else {
-        overlayEntry->loadedRamAddr = Overlay_AllocateAndLoad(overlayEntry->vromStart, overlayEntry->vromEnd,
-                                                              overlayEntry->vramStart, overlayEntry->vramEnd);
-
-        if (overlayEntry->loadedRamAddr == NULL) {
-            osSyncPrintf("ロードに失敗しました\n"); // "Loading failed"
-            return;
-        }
+        overlayEntry->loadedRamAddr = overlayEntry->vramStart;
 
         osSyncPrintf(VT_FGCOL(GREEN));
         osSyncPrintf("OVL(d):Seg:%08x-%08x Ram:%08x-%08x Off:%08x %s\n", overlayEntry->vramStart, overlayEntry->vramEnd,
