@@ -12,15 +12,11 @@ KaleidoMgrOverlay gKaleidoMgrOverlayTable[] = {
     KALEIDO_OVERLAY(player_actor),
 };
 
-void* sKaleidoAreaPtr = NULL;
 KaleidoMgrOverlay* gKaleidoMgrCurOvl = NULL;
 u8 gBossMarkState = 0;
 
 void KaleidoManager_LoadOvl(KaleidoMgrOverlay* ovl) {
-    LogUtils_CheckNullPointer("KaleidoArea_allocp", sKaleidoAreaPtr, "../z_kaleido_manager.c", 99);
-
-    ovl->loadedRamAddr = sKaleidoAreaPtr;
-    Overlay_Load(ovl->vromStart, ovl->vromEnd, ovl->vramStart, ovl->vramEnd, ovl->loadedRamAddr);
+    ovl->loadedRamAddr = ovl->vromStart;
 
     osSyncPrintf(VT_FGCOL(GREEN));
     osSyncPrintf("OVL(k):Seg:%08x-%08x Ram:%08x-%08x Off:%08x %s\n", ovl->vramStart, ovl->vramEnd, ovl->loadedRamAddr,
@@ -28,14 +24,13 @@ void KaleidoManager_LoadOvl(KaleidoMgrOverlay* ovl) {
                  (u32)ovl->vramStart - (u32)ovl->loadedRamAddr, ovl->name);
     osSyncPrintf(VT_RST);
 
-    ovl->offset = (u32)ovl->loadedRamAddr - (u32)ovl->vramStart;
+    ovl->offset = 0;
     gKaleidoMgrCurOvl = ovl;
 }
 
 void KaleidoManager_ClearOvl(KaleidoMgrOverlay* ovl) {
     if (ovl->loadedRamAddr != NULL) {
         ovl->offset = 0;
-        bzero(ovl->loadedRamAddr, (u32)ovl->vramEnd - (u32)ovl->vramStart);
         ovl->loadedRamAddr = NULL;
         gKaleidoMgrCurOvl = NULL;
     }
@@ -57,13 +52,6 @@ void KaleidoManager_Init(GlobalContext* globalCtx) {
     osSyncPrintf("KaleidoArea の最大サイズは %d バイトを確保します\n", largestSize);
     osSyncPrintf(VT_RST);
 
-    sKaleidoAreaPtr = GameState_Alloc(&globalCtx->state, largestSize, "../z_kaleido_manager.c", 150);
-    LogUtils_CheckNullPointer("KaleidoArea_allocp", sKaleidoAreaPtr, "../z_kaleido_manager.c", 151);
-
-    osSyncPrintf(VT_FGCOL(GREEN));
-    osSyncPrintf("KaleidoArea %08x - %08x\n", sKaleidoAreaPtr, (u32)sKaleidoAreaPtr + largestSize);
-    osSyncPrintf(VT_RST);
-
     gKaleidoMgrCurOvl = 0;
 }
 
@@ -72,12 +60,11 @@ void KaleidoManager_Destroy() {
         KaleidoManager_ClearOvl(gKaleidoMgrCurOvl);
         gKaleidoMgrCurOvl = NULL;
     }
-
-    sKaleidoAreaPtr = NULL;
 }
 
 // NOTE: this function looks messed up and probably doesn't work how it was intended to
 void* KaleidoManager_GetRamAddr(void* vram) {
+    return vram;
     KaleidoMgrOverlay* iter = gKaleidoMgrCurOvl;
     KaleidoMgrOverlay* ovl = iter;
     u32 i;

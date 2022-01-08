@@ -1,6 +1,15 @@
 #include "global.h"
 #include "vt.h"
 
+#include <stdint.h>
+#include "gfx_pc.h"
+#include "gfx_opengl.h"
+#include "gfx_direct3d11.h"
+#include "gfx_direct3d12.h"
+#include "gfx_dxgi.h"
+#include "gfx_glx.h"
+#include "gfx_sdl.h"
+
 #define GFXPOOL_HEAD_MAGIC 0x1234
 #define GFXPOOL_TAIL_MAGIC 0x5678
 
@@ -124,6 +133,8 @@ void Graph_TaskSet00(GraphicsContext* gfxCtx) {
     }
 
     sGraphCfbInfoIdx = sGraphCfbInfoIdx % ARRAY_COUNT(sGraphCfbInfos);
+
+    gfx_run(gfxCtx->workBuffer);
 }
 
 void Graph_Update(GraphicsContext* gfxCtx, GameState* gameState) {
@@ -254,6 +265,8 @@ void Graph_Update(GraphicsContext* gfxCtx, GameState* gameState) {
     }
 }
 
+extern struct GfxWindowManagerAPI *wm_api;
+
 void Graph_ThreadEntry(void* arg0) {
     GraphicsContext gfxCtx;
     GameState* gameState;
@@ -285,7 +298,9 @@ void Graph_ThreadEntry(void* arg0) {
         GameState_Init(gameState, ovl->init, &gfxCtx);
 
         while (GameState_IsRunning(gameState)) {
+            gfx_start_frame();
             Graph_Update(&gfxCtx, gameState);
+            gfx_end_frame();
         }
 
         nextOvl = Graph_GetNextGameState(gameState);

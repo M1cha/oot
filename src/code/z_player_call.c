@@ -17,7 +17,7 @@ void Player_Destroy(Actor* thisx, GlobalContext* globalCtx);
 void Player_Update(Actor* thisx, GlobalContext* globalCtx);
 void Player_Draw(Actor* thisx, GlobalContext* globalCtx);
 
-const ActorInit Player_InitVars = {
+ActorInit Player_InitVars = {
     ACTOR_PLAYER,
     ACTORCAT_PLAYER,
     FLAGS,

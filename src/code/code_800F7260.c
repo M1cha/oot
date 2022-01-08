@@ -600,6 +600,7 @@ void Audio_StopSfxByPosAndBank(u8 bankId, Vec3f* pos) {
 }
 
 void Audio_StopSfxByPos(Vec3f* pos) {
+    return;
     u8 i;
     SoundBankEntry cmp;
 
@@ -666,6 +667,7 @@ void Audio_StopSfxByTokenAndId(u8 token, u16 sfxId) {
 }
 
 void Audio_StopSfxById(u32 sfxId) {
+    return;
     SoundBankEntry* entry;
     u8 entryIndex = gSoundBanks[SFX_BANK(sfxId)][0].next;
     u8 prevEntryIndex = 0;

@@ -826,7 +826,6 @@ void Sram_WriteSramHeader(SramContext* sramCtx) {
 }
 
 void Sram_InitSram(GameState* gameState, SramContext* sramCtx) {
-    return;
     u16 i;
 
     osSyncPrintf("sram_initialize( Game *game, Sram *sram )\n");

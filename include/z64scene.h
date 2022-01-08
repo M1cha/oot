@@ -15,6 +15,7 @@ typedef struct {
     /* 0x11 */ u8  config;
     /* 0x12 */ u8  unk_12;
     /* 0x13 */ u8  unk_13;
+    void *sceneCommands;
 } SceneTableEntry; // size = 0x14
 
 typedef struct {

@@ -211,6 +211,9 @@ void FaultDrawer_SetCharPad(s8 padW, s8 padH) {
 }
 
 void Fault_AddHungupAndCrashImpl(const char* arg0, const char* arg1) {
+    osSyncPrintf("%s\n", arg0 != NULL ? arg0 : "(NULL)");
+    osSyncPrintf("%s\n", arg1 != NULL ? arg1 : "(NULL)");
+    abort();
 }
 
 void FaultDrawer_DrawText(s32 x, s32 y, const char* fmt, ...) {
@@ -258,8 +261,15 @@ s32 DmaMgr_DmaRomToRam(u32 rom, u32 ram, u32 size) {
 }
 
 s32 osEPiStartDma(OSPiHandle *pihandle, OSIoMesg *mb, s32 direction) {
-    //abort();
-    memcpy(mb->dramAddr, (const void *) mb->devAddr, mb->size);
+    switch(direction) {
+    case OS_READ:
+        memcpy(mb->dramAddr, (const void *) mb->devAddr, mb->size);
+        break;
+
+    case OS_WRITE:
+        memcpy((void *) mb->devAddr, mb->dramAddr, mb->size);
+        break;
+    }
     osSendMesg(mb->hdr.retQueue, mb, OS_MESG_NOBLOCK);
     return 0;
 }

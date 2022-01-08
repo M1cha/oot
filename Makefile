@@ -35,7 +35,7 @@ LD         := $(CROSS_COMPILE)ld
 OBJCOPY    := $(CROSS_COMPILE)objcopy
 OBJDUMP    := $(CROSS_COMPILE)objdump
 
-INC        := -Iinclude -Isrc -Iassets -Ibuild -I.
+INC        := -Iinclude -Isrc -Iassets -Ibuild -I. -Isrc/n64-fast3d-engine
 
 CHECK_WARNINGS := -Wall -Wextra -Wno-format-security -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-variable -Wno-missing-braces -Wno-int-conversion
 
@@ -46,8 +46,8 @@ ZAPD       := tools/ZAPD/ZAPD.out
 
 OPTFLAGS := -Og
 ASFLAGS := -march=i386 --32 -Iinclude
-CFLAGS += -fno-builtin -fsigned-char -std=gnu90 -D _LANGUAGE_C -D NON_MATCHING $(INC) $(CHECK_WARNINGS) -g
-LDFLAGS += -lm
+CFLAGS += -fno-builtin -fsigned-char -std=gnu99 -D _LANGUAGE_C -D NON_MATCHING -DENABLE_OPENGL $(INC) $(CHECK_WARNINGS) -g $(shell sdl2-config --cflags)
+LDFLAGS += -lm -lGL $(shell sdl2-config --libs) -lX11 -lXrandr
 
 ifneq ($(shell getconf LONG_BIT), 32)
   # Ensure that gcc treats the code as 32-bit

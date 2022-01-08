@@ -5,6 +5,11 @@
 beginseg
     name "boot"
     address 0x80000460
+    include "build/src/n64-fast3d-engine/gfx_cc.o"
+    include "build/src/n64-fast3d-engine/gfx_opengl.o"
+    include "build/src/n64-fast3d-engine/gfx_glx.o"
+    include "build/src/n64-fast3d-engine/gfx_pc.o"
+    include "build/src/n64-fast3d-engine/gfx_sdl2.o"
     include "build/src/port.o"
     include "build/src/boot/viconfig.o"
     include "build/src/boot/yaz0.o"

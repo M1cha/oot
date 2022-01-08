@@ -159,7 +159,7 @@ bool Globals::GetSegmentedPtrName(segptr_t segAddress, ZFile* currentFile,
 		return true;
 	}
 
-	declName = StringHelper::Sprintf("0x%08X", segAddress);
+	declName = StringHelper::Sprintf("0xabababab");
 	return false;
 }
 

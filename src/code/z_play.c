@@ -1463,7 +1463,7 @@ void Gameplay_InitScene(GlobalContext* globalCtx, s32 spawn) {
     func_80096FD4(globalCtx, &globalCtx->roomCtx.curRoom);
     YREG(15) = 0;
     gSaveContext.worldMapArea = 0;
-    Scene_ExecuteCommands(globalCtx, globalCtx->sceneSegment);
+    Scene_ExecuteCommands(globalCtx, globalCtx->loadedScene->sceneCommands);
     Gameplay_InitEnvironment(globalCtx, globalCtx->skyboxId);
 }
 

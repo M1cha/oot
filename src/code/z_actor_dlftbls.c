@@ -26,7 +26,7 @@
 #define DEFINE_ACTOR(name, _1, allocType) \
     { (u32)_ovl_##name##SegmentRomStart,  \
       (u32)_ovl_##name##SegmentRomEnd,    \
-      _ovl_##name##SegmentStart,          \
+      0,          \
       _ovl_##name##SegmentEnd,            \
       NULL,                               \
       &name##_InitVars,                   \

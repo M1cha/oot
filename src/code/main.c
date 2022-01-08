@@ -1,6 +1,15 @@
 #include "global.h"
 #include "vt.h"
 
+#include <stdint.h>
+#include "gfx_pc.h"
+#include "gfx_opengl.h"
+#include "gfx_direct3d11.h"
+#include "gfx_direct3d12.h"
+#include "gfx_dxgi.h"
+#include "gfx_glx.h"
+#include "gfx_sdl.h"
+
 s32 gScreenWidth = SCREEN_WIDTH;
 s32 gScreenHeight = SCREEN_HEIGHT;
 u32 gSystemHeapSize = 0;
@@ -10,6 +19,9 @@ u32 gSegments[NUM_SEGMENTS];
 AudioMgr gAudioMgr;
 OSMesgQueue sSiIntMsgQ;
 OSMesg sSiIntMsgBuf[1];
+
+struct GfxWindowManagerAPI *wm_api;
+static struct GfxRenderingAPI *rendering_api;
 
 void Main_LogSystemHeap(void) {
     osSyncPrintf(VT_FGCOL(GREEN));
@@ -24,6 +36,27 @@ int main(void) {
     s32 debugHeap;
     s32 debugHeapSize;
     s16* msg;
+
+#if defined(ENABLE_DX12)
+    rendering_api = &gfx_direct3d12_api;
+    wm_api = &gfx_dxgi_api;
+#elif defined(ENABLE_DX11)
+    rendering_api = &gfx_direct3d11_api;
+    wm_api = &gfx_dxgi_api;
+#elif defined(ENABLE_OPENGL)
+    rendering_api = &gfx_opengl_api;
+    #if defined(__linux__) || defined(__BSD__)
+        wm_api = &gfx_glx;
+    #else
+        wm_api = &gfx_sdl;
+    #endif
+#elif defined(ENABLE_GFX_DUMMY)
+    rendering_api = &gfx_dummy_renderer_api;
+    wm_api = &gfx_dummy_wm_api;
+#endif
+
+    gfx_init(wm_api, rendering_api, "Super Mario 64 PC-Port", 0);
+
 
     osSyncPrintf("mainproc 実行開始\n"); // "Start running"
     gScreenWidth = SCREEN_WIDTH;
