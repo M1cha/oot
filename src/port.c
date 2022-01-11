@@ -33,12 +33,12 @@ u32 D_80009460 = 0;
 u32 gDmaMgrDmaBuffSize = 0x2000;
 OSPiHandle* __osPiTable;
 
-void guMtxF2L(MtxF* m1, Mtx *m2) {
-    memcpy(m2->m, m1, sizeof(Mtx));
+void guMtxF2L(MtxF* mf, Mtx* m) {
+    Matrix_MtxFToMtx(mf, m);
 }
 
-void guMtxL2F(MtxF* m1, Mtx* m2) {
-    memcpy(m1, m2->m, sizeof(Mtx));
+void guMtxL2F(MtxF* mf, Mtx* m) {
+    Matrix_MtxToMtxF(mf, m);
 }
 
 void guMtxIdentF(float mf[4][4]) {
@@ -54,11 +54,11 @@ void guMtxIdentF(float mf[4][4]) {
     }
 }
 
-void guMtxIdent(Mtx *m) {
+void guMtxIdent(Mtx* m) {
 #ifndef GBI_FLOATS
-    MtxF mf;
-    guMtxIdentF(mf.mf);
-    guMtxF2L(&mf, m);
+    float mf[4][4];
+    guMtxIdentF(mf);
+    guMtxF2L(mf, m);
 #else
     guMtxIdentF(m->m);
 #endif
@@ -227,17 +227,20 @@ OSId osGetThreadId(OSThread* thread) {
 }
 
 s32 DmaMgr_SendRequest0(u32 ram, u32 vrom, u32 size) {
+    abort();
     memcpy(ram, vrom, size);
     return 0;
 }
 
 s32 DmaMgr_SendRequest1(void* ram0, u32 vrom, u32 size, const char* file, s32 line) {
+    abort();
     memcpy(ram0, vrom, size);
     return 0;
 }
 
 s32 DmaMgr_SendRequest2(DmaRequest* req, u32 ram, u32 vrom, u32 size, u32 unk5, OSMesgQueue* queue, OSMesg msg,
                         const char* file, s32 line) {
+    abort();
     req->vromAddr = vrom;
     req->dramAddr = (void*)ram;
     req->size = size;
@@ -255,7 +258,7 @@ s32 DmaMgr_SendRequest2(DmaRequest* req, u32 ram, u32 vrom, u32 size, u32 unk5, 
 }
 
 s32 DmaMgr_DmaRomToRam(u32 rom, u32 ram, u32 size) {
-    //abort();
+    abort();
     memcpy(ram, rom, size);
     return 0;
 }
@@ -370,4 +373,17 @@ void AudioMgr_Unlock(AudioMgr* audioMgr) {
 
 OSPiHandle* osCartRomInit(void) {
     return NULL;
+}
+
+static uint8_t fb0[0x1000000];
+static uint8_t fb1[0x1000000];
+
+u32 SysCfb_GetFbPtr(s32 idx) {
+    if (idx == 0) {
+        return fb0;
+    }
+    if (idx == 1) {
+        return fb1;
+    }
+    return 0;
 }

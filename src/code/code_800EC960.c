@@ -4021,6 +4021,7 @@ void func_800F45D0(f32 arg0) {
 }
 
 void Audio_PlaySoundRiver(Vec3f* pos, f32 freqScale) {
+    return;
     if (!Audio_IsSfxPlaying(NA_SE_EV_RIVER_STREAM - SFX_FLAG)) {
         sRiverFreqScaleLerp.value = freqScale;
     } else if (freqScale != sRiverFreqScaleLerp.value) {
@@ -4033,6 +4034,7 @@ void Audio_PlaySoundRiver(Vec3f* pos, f32 freqScale) {
 }
 
 void Audio_PlaySoundWaterfall(Vec3f* pos, f32 freqScale) {
+    return;
     if (!Audio_IsSfxPlaying(NA_SE_EV_WATER_WALL_BIG - SFX_FLAG)) {
         sWaterfallFreqScaleLerp.value = freqScale;
     } else if (freqScale != sWaterfallFreqScaleLerp.value) {

@@ -46,7 +46,7 @@ ZAPD       := tools/ZAPD/ZAPD.out
 
 OPTFLAGS := -Og
 ASFLAGS := -march=i386 --32 -Iinclude
-CFLAGS += -fno-builtin -fsigned-char -std=gnu99 -D _LANGUAGE_C -D NON_MATCHING -DENABLE_OPENGL $(INC) $(CHECK_WARNINGS) -g $(shell sdl2-config --cflags)
+CFLAGS += -fno-builtin -fsigned-char -std=gnu99 -D _LANGUAGE_C -D NON_MATCHING -DENABLE_OPENGL $(INC) $(CHECK_WARNINGS) -g $(shell sdl2-config --cflags) -fstack-protector-strong -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract -fsanitize=undefined
 LDFLAGS += -lm -lGL $(shell sdl2-config --libs) -lX11 -lXrandr
 
 ifneq ($(shell getconf LONG_BIT), 32)

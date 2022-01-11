@@ -38,12 +38,10 @@ void Font_LoadOrderedFont(Font* font) {
     s32 fontBufIndex;
     s32 offset;
 
-    return;
-    font->msgOffset = _message_0xFFFC_nes - (const char*)_nes_message_data_staticSegmentStart;
-    len = font->msgLength = _message_0xFFFD_nes - _message_0xFFFC_nes;
+    font->msgOffset = _message_0xFFFC_nes;
+    len = 0x48;
 
-    DmaMgr_SendRequest1(font->msgBuf, &_nes_message_data_staticSegmentRomStart[font->msgOffset], len, "../z_kanfont.c",
-                        122);
+    memcpy(font->msgBuf, font->msgOffset, len);
     osSyncPrintf("msg_data=%x,  msg_data0=%x   jj=%x\n", font->msgOffset, font->msgLength, jj = len);
 
     len = jj;
@@ -60,7 +58,7 @@ void Font_LoadOrderedFont(Font* font) {
             osSyncPrintf("nes_mes_buf[%d]=%d\n", codePointIndex, font->msgBuf[codePointIndex]);
 
             offset = (font->msgBuf[codePointIndex] - '\x20') * FONT_CHAR_TEX_SIZE;
-            DmaMgr_SendRequest1(fontBuf, fontStatic + offset, FONT_CHAR_TEX_SIZE, "../z_kanfont.c", 134);
+            memcpy(fontBuf, fontStatic + offset, FONT_CHAR_TEX_SIZE);
             fontBufIndex += FONT_CHAR_TEX_SIZE / 8;
         }
     }

@@ -18,6 +18,7 @@
 #include "gfx_screen_config.h"
 
 #define SUPPORT_CHECK(x) assert(x)
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 // SCALE_M_N: upscale/downscale M-bit integer to N-bit
 #define SCALE_5_8(VAL_) (((VAL_) * 0xFF) / 0x1F)
@@ -101,6 +102,8 @@ static struct RSP {
     } texture_scaling_factor;
     
     struct LoadedVertex loaded_vertices[MAX_VERTICES + 4];
+
+    uint32_t segments[32];
 } rsp;
 
 static struct RDP {
@@ -223,6 +226,9 @@ static void gfx_generate_cc(struct ColorCombiner *comb, uint32_t cc_id) {
                     }
                     val = input_number[c[i][j]];
                     break;
+        default:
+            printf("unsupported CC 0x%02x\n", c[i][j]);
+            break;
             }
             shader_id |= val << (i * 12 + j * 3);
         }
@@ -553,9 +559,10 @@ static void gfx_matrix_mul(float res[4][4], const float a[4][4], const float b[4
 static void gfx_sp_matrix(uint8_t parameters, const int32_t *addr) {
     float matrix[4][4];
 
-    if (addr == 0xabababab) {
+    /*if (addr == 0xabababab) {
+        printf("== IGNORE MATRIX %p\n", addr);
         return;
-    }
+    }*/
 
 #ifndef GBI_FLOATS
     // Original GBI where fixed point matrices are used
@@ -984,11 +991,21 @@ static void gfx_sp_movemem(uint8_t index, uint8_t offset, const void* data) {
             memcpy(rsp.current_lights + (index - G_MV_L0) / 2, data, sizeof(Light_t));
             break;
 #endif
+        default:
+            printf("unsupported movemem index 0x%02x\n", index);
+            break;
     }
 }
 
 static void gfx_sp_moveword(uint8_t index, uint16_t offset, uint32_t data) {
     switch (index) {
+        case G_MW_SEGMENT:
+            uint16_t segment = offset / 4;
+
+            assert (segment < ARRAY_SIZE(rsp.segments));
+
+            rsp.segments[segment] = data;
+            break;
         case G_MW_NUMLIGHT:
 #ifdef F3DEX_GBI_2
             rsp.current_num_lights = data / 24 + 1; // add ambient light
@@ -1002,6 +1019,13 @@ static void gfx_sp_moveword(uint8_t index, uint16_t offset, uint32_t data) {
         case G_MW_FOG:
             rsp.fog_mul = (int16_t)(data >> 16);
             rsp.fog_offset = (int16_t)data;
+            break;
+        case G_MW_CLIP:
+            break;
+        case G_MW_PERSPNORM:
+            break;
+        default:
+            printf("unsupported moveword index 0x%02x\n", index);
             break;
     }
 }
@@ -1356,6 +1380,14 @@ static void gfx_sp_set_other_mode(uint32_t shift, uint32_t num_bits, uint64_t mo
 }
 
 static inline void *seg_addr(uintptr_t w1) {
+    if ((w1 & 0xf0fff000) == 0) {
+        uint8_t segment = (w1 & 0x0f000000) >> 24;
+        uintptr_t offset = w1 & 0x00ffffff;
+        void * ret = rsp.segments[segment] + offset;
+
+        printf("translate 0x%08x to %p\n", w1, ret);
+        return ret;
+    }
     return (void *) w1;
 }
 
@@ -1363,9 +1395,10 @@ static inline void *seg_addr(uintptr_t w1) {
 #define C1(pos, width) ((cmd->words.w1 >> (pos)) & ((1U << width) - 1))
 
 static void gfx_run_dl(Gfx* cmd) {
-    if (cmd == 0xabababab) {
+    /*if (cmd == 0xabababab || cmd == 0x09000000) {
+        printf("== IGNORE DL %p\n", cmd);
         return;
-    }
+    }*/
 
     int dummy = 0;
     for (;;) {
@@ -1566,6 +1599,23 @@ static void gfx_run_dl(Gfx* cmd) {
                 break;
             case G_SETCIMG:
                 gfx_dp_set_color_image(C0(21, 3), C0(19, 2), C0(0, 11), seg_addr(cmd->words.w1));
+                break;
+            case G_NOOP:
+                break;
+            case G_RDPPIPESYNC:
+                break;
+            case G_RDPLOADSYNC:
+                break;
+            case G_RDPTILESYNC:
+                break;
+            case G_RDPFULLSYNC:
+                break;
+            case G_SETBLENDCOLOR:
+                break;
+            case G_RDPSETOTHERMODE:
+                break;
+            default:
+                printf("unsupported opcode 0x%08x\n", opcode);
                 break;
         }
         ++cmd;

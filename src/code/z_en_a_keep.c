@@ -1,6 +1,7 @@
 #include "global.h"
 #include "vt.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
+#include "objects/object_d_hsblock/object_d_hsblock.h"
 
 #define FLAGS ACTOR_FLAG_4
 
@@ -52,15 +53,13 @@ static ColliderCylinderInit sCylinderInit = {
     { 25, 60, 0, { 0, 0, 0 } },
 };
 
-CollisionHeader D_06000730; // gHookshotTargetCol ?
-
 static CollisionHeader* sColHeaders[] = {
     &gLargerCubeCol,       // A_OBJ_GRASS_CLUMP, A_OBJ_TREE_STUMP
     &gLargerCubeCol,       // A_OBJ_BLOCK_LARGE, A_OBJ_BLOCK_HUGE
     &gSmallerFlatBlockCol, // unused
     &gLargerFlatBlockCol,  // A_OBJ_BLOCK_SMALL_ROT, A_OBJ_BLOCK_LARGE_ROT
     &gSmallerCubeCol,      // unused
-    &D_06000730,           // A_OBJ_UNKNOWN_6
+    &gHookshotTargetCol,           // A_OBJ_UNKNOWN_6
 };
 
 static Gfx* sDLists[] = {

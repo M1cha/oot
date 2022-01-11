@@ -55,8 +55,7 @@ int main(void) {
     wm_api = &gfx_dummy_wm_api;
 #endif
 
-    gfx_init(wm_api, rendering_api, "Super Mario 64 PC-Port", 0);
-
+    gfx_init(wm_api, rendering_api, "Zelda OOT PC-Port", 0);
 
     osSyncPrintf("mainproc 実行開始\n"); // "Start running"
     gScreenWidth = SCREEN_WIDTH;

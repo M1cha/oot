@@ -1433,14 +1433,6 @@ f32 func_800BFCB8(GlobalContext* globalCtx, MtxF* mf, Vec3f* vec) {
 
 void* Gameplay_LoadFile(GlobalContext* globalCtx, RomFile* file) {
     return file->vromStart;
-    u32 size;
-    void* allocp;
-
-    size = file->vromEnd - file->vromStart;
-    allocp = GameState_Alloc(&globalCtx->state, size, "../z_play.c", 4692);
-    DmaMgr_SendRequest1(allocp, file->vromStart, size, "../z_play.c", 4694);
-
-    return allocp;
 }
 
 void Gameplay_InitEnvironment(GlobalContext* globalCtx, s16 skyboxId) {

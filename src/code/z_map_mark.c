@@ -57,20 +57,11 @@ void MapMark_Init(GlobalContext* globalCtx) {
     MapMarkDataOverlay* overlay = &sMapMarkDataOvl;
     u32 overlaySize = (u32)overlay->vramEnd - (u32)overlay->vramStart;
 
-    overlay->loadedRamAddr = GameState_Alloc(&globalCtx->state, overlaySize, "../z_map_mark.c", 235);
-    LogUtils_CheckNullPointer("dlftbl->allocp", overlay->loadedRamAddr, "../z_map_mark.c", 236);
-
-    Overlay_Load(overlay->vromStart, overlay->vromEnd, overlay->vramStart, overlay->vramEnd, overlay->loadedRamAddr);
-
     sLoadedMarkDataTable = gMapMarkDataTable;
-    sLoadedMarkDataTable = (void*)(u32)(
-        (overlay->vramTable != NULL)
-            ? (void*)((u32)overlay->vramTable - (s32)((u32)overlay->vramStart - (u32)overlay->loadedRamAddr))
-            : NULL);
+    sLoadedMarkDataTable = overlay->vramTable?:NULL;
 }
 
 void MapMark_ClearPointers(GlobalContext* globalCtx) {
-    sMapMarkDataOvl.loadedRamAddr = NULL;
     sLoadedMarkDataTable = NULL;
 }
 

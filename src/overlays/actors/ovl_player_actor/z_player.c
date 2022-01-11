@@ -4640,21 +4640,6 @@ s32 func_8083ADD4(GlobalContext* globalCtx, Player* this) {
 }
 
 void func_8083AE40(Player* this, s16 objectId) {
-    s32 pad;
-    u32 size;
-
-    if (objectId != 0) {
-        this->giObjectLoading = true;
-        osCreateMesgQueue(&this->giObjectLoadQueue, &this->giObjectLoadMsg, 1);
-
-        size = gObjectTable[objectId].vromEnd - gObjectTable[objectId].vromStart;
-
-        LOG_HEX("size", size, "../z_player.c", 9090);
-        ASSERT(size <= 1024 * 8, "size <= 1024 * 8", "../z_player.c", 9091);
-
-        DmaMgr_SendRequest2(&this->giObjectDmaRequest, (u32)this->giObjectSegment, gObjectTable[objectId].vromStart,
-                            size, 0, &this->giObjectLoadQueue, NULL, "../z_player.c", 9099);
-    }
 }
 
 void func_8083AF44(GlobalContext* globalCtx, Player* this, s32 magicSpell) {
@@ -9072,7 +9057,6 @@ void Player_Init(Actor* thisx, GlobalContext* globalCtx2) {
     Player_SetEquipmentData(globalCtx, this);
     this->prevBoots = this->currentBoots;
     Player_InitCommon(this, globalCtx, gPlayerSkelHeaders[((void)0, gSaveContext.linkAge)]);
-    this->giObjectSegment = (void*)(((u32)ZeldaArena_MallocDebug(0x3008, "../z_player.c", 17175) + 8) & ~0xF);
 
     sp50 = gSaveContext.respawnFlag;
 
@@ -9109,7 +9093,7 @@ void Player_Init(Actor* thisx, GlobalContext* globalCtx2) {
                  0x4000) &&
                 ((globalCtx->sceneNum != SCENE_DDAN) || (gSaveContext.eventChkInf[11] & 1)) &&
                 ((globalCtx->sceneNum != SCENE_NIGHT_SHOP) || (gSaveContext.eventChkInf[2] & 0x20))) {
-                TitleCard_InitPlaceName(globalCtx, &globalCtx->actorCtx.titleCtx, this->giObjectSegment, 160, 120, 144,
+                TitleCard_InitPlaceName(globalCtx, &globalCtx->actorCtx.titleCtx, NULL, 160, 120, 144,
                                         24, 20);
             }
         }

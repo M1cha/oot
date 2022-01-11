@@ -1258,21 +1258,17 @@ void func_800849EC(GlobalContext* globalCtx) {
 void Interface_LoadItemIcon1(GlobalContext* globalCtx, u16 button) {
     InterfaceContext* interfaceCtx = &globalCtx->interfaceCtx;
 
-    osCreateMesgQueue(&interfaceCtx->loadQueue, &interfaceCtx->loadMsg, OS_MESG_BLOCK);
-    DmaMgr_SendRequest2(&interfaceCtx->dmaRequest_160, interfaceCtx->iconItemSegment + button * 0x1000,
+    memcpy(interfaceCtx->iconItemSegment + button * 0x1000,
                         (u32)_icon_item_staticSegmentRomStart + (gSaveContext.equips.buttonItems[button] * 0x1000),
-                        0x1000, 0, &interfaceCtx->loadQueue, NULL, "../z_parameter.c", 1171);
-    osRecvMesg(&interfaceCtx->loadQueue, NULL, OS_MESG_BLOCK);
+                        0x1000);
 }
 
 void Interface_LoadItemIcon2(GlobalContext* globalCtx, u16 button) {
     InterfaceContext* interfaceCtx = &globalCtx->interfaceCtx;
 
-    osCreateMesgQueue(&interfaceCtx->loadQueue, &interfaceCtx->loadMsg, OS_MESG_BLOCK);
-    DmaMgr_SendRequest2(&interfaceCtx->dmaRequest_180, interfaceCtx->iconItemSegment + button * 0x1000,
+    memcpy(interfaceCtx->iconItemSegment + button * 0x1000,
                         (u32)_icon_item_staticSegmentRomStart + (gSaveContext.equips.buttonItems[button] * 0x1000),
-                        0x1000, 0, &interfaceCtx->loadQueue, NULL, "../z_parameter.c", 1193);
-    osRecvMesg(&interfaceCtx->loadQueue, NULL, OS_MESG_BLOCK);
+                        0x1000);
 }
 
 void func_80084BF4(GlobalContext* globalCtx, u16 flag) {
@@ -2053,12 +2049,9 @@ void Interface_LoadActionLabel(InterfaceContext* interfaceCtx, u16 action, s16 l
 
     if ((action != DO_ACTION_NONE) && (action != DO_ACTION_MAX + DO_ACTION_NONE) &&
         (action != 2 * DO_ACTION_MAX + DO_ACTION_NONE)) {
-        osCreateMesgQueue(&interfaceCtx->loadQueue, &interfaceCtx->loadMsg, OS_MESG_BLOCK);
-        DmaMgr_SendRequest2(&interfaceCtx->dmaRequest_160,
+        memcpy(
                             interfaceCtx->doActionSegment + (loadOffset * DO_ACTION_TEX_SIZE),
-                            (u32)_do_action_staticSegmentRomStart + (action * DO_ACTION_TEX_SIZE), DO_ACTION_TEX_SIZE,
-                            0, &interfaceCtx->loadQueue, NULL, "../z_parameter.c", 2145);
-        osRecvMesg(&interfaceCtx->loadQueue, NULL, OS_MESG_BLOCK);
+                            (u32)_do_action_staticSegmentRomStart + (action * DO_ACTION_TEX_SIZE), DO_ACTION_TEX_SIZE);
     } else {
         gSegments[7] = VIRTUAL_TO_PHYSICAL(interfaceCtx->doActionSegment);
         func_80086D5C(SEGMENTED_TO_VIRTUAL(sDoActionTextures[loadOffset]), DO_ACTION_TEX_SIZE / 4);
@@ -2115,11 +2108,8 @@ void Interface_LoadActionLabelB(GlobalContext* globalCtx, u16 action) {
 
     interfaceCtx->unk_1FC = action;
 
-    osCreateMesgQueue(&interfaceCtx->loadQueue, &interfaceCtx->loadMsg, OS_MESG_BLOCK);
-    DmaMgr_SendRequest2(&interfaceCtx->dmaRequest_160, interfaceCtx->doActionSegment + DO_ACTION_TEX_SIZE,
-                        (u32)_do_action_staticSegmentRomStart + (action * DO_ACTION_TEX_SIZE), DO_ACTION_TEX_SIZE, 0,
-                        &interfaceCtx->loadQueue, NULL, "../z_parameter.c", 2228);
-    osRecvMesg(&interfaceCtx->loadQueue, NULL, OS_MESG_BLOCK);
+    memcpy(interfaceCtx->doActionSegment + DO_ACTION_TEX_SIZE,
+                        (u32)_do_action_staticSegmentRomStart + (action * DO_ACTION_TEX_SIZE), DO_ACTION_TEX_SIZE);
 
     interfaceCtx->unk_1FA = 1;
 }

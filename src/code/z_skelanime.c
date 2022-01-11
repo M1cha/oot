@@ -846,11 +846,9 @@ void AnimationContext_SetLoadFrame(GlobalContext* globalCtx, LinkAnimationHeader
         LinkAnimationHeader* linkAnimHeader = SEGMENTED_TO_VIRTUAL(animation);
         u32 ram = frameTable;
 
-        osCreateMesgQueue(&entry->data.load.msgQueue, &entry->data.load.msg, 1);
-        DmaMgr_SendRequest2(&entry->data.load.req, ram,
+        memcpy(ram,
                             LINK_ANIMATION_OFFSET(linkAnimHeader->segment, ((sizeof(Vec3s) * limbCount + 2) * frame)),
-                            sizeof(Vec3s) * limbCount + 2, 0, &entry->data.load.msgQueue, NULL, "../z_skelanime.c",
-                            2004);
+                            sizeof(Vec3s) * limbCount + 2);
     }
 }
 

@@ -130,9 +130,7 @@ void Map_InitData(GlobalContext* globalCtx, s16 room) {
             osSyncPrintf("ＫＫＫ＝%d\n", extendedMapIndex);
             osSyncPrintf(VT_RST);
             sEntranceIconMapIndex = extendedMapIndex;
-            DmaMgr_SendRequest1(interfaceCtx->mapSegment,
-                                (u32)_map_grand_staticSegmentRomStart + gMapData->owMinimapTexOffset[extendedMapIndex],
-                                gMapData->owMinimapTexSize[mapIndex], "../z_map_exp.c", 309);
+            interfaceCtx->mapSegment = (u32)_map_grand_staticSegmentRomStart + gMapData->owMinimapTexOffset[extendedMapIndex];
             interfaceCtx->unk_258 = mapIndex;
             break;
         case SCENE_YDAN:
@@ -158,10 +156,9 @@ void Map_InitData(GlobalContext* globalCtx, s16 room) {
             osSyncPrintf("デクの樹ダンジョンＭＡＰ テクスチャＤＭＡ(%x) scene_id_offset=%d  VREG(30)=%d\n", room,
                          mapIndex, VREG(30));
             osSyncPrintf(VT_RST);
-            DmaMgr_SendRequest1(globalCtx->interfaceCtx.mapSegment,
+            globalCtx->interfaceCtx.mapSegment = 
                                 (u32)_map_i_staticSegmentRomStart +
-                                    ((gMapData->dgnMinimapTexIndexOffset[mapIndex] + room) * 0xFF0),
-                                0xFF0, "../z_map_exp.c", 346);
+                                    ((gMapData->dgnMinimapTexIndexOffset[mapIndex] + room) * 0xFF0);
             R_COMPASS_OFFSET_X = gMapData->roomCompassOffsetX[mapIndex][room];
             R_COMPASS_OFFSET_Y = gMapData->roomCompassOffsetY[mapIndex][room];
             Map_SetFloorPalettesData(globalCtx, VREG(30));
@@ -230,12 +227,6 @@ void Map_Init(GlobalContext* globalCtx) {
 
     interfaceCtx->unk_258 = -1;
     interfaceCtx->unk_25A = -1;
-
-    interfaceCtx->mapSegment = GameState_Alloc(&globalCtx->state, 0x1000, "../z_map_exp.c", 457);
-    // "ＭＡＰ texture initialization scene_data_ID=%d mapSegment=%x"
-    osSyncPrintf("\n\n\nＭＡＰ テクスチャ初期化   scene_data_ID=%d\nmapSegment=%x\n\n", globalCtx->sceneNum,
-                 interfaceCtx->mapSegment, globalCtx);
-    ASSERT(interfaceCtx->mapSegment != NULL, "parameter->mapSegment != NULL", "../z_map_exp.c", 459);
 
     switch (globalCtx->sceneNum) {
         case SCENE_SPOT00:
