@@ -1,9 +1,13 @@
+pub mod gamestates;
+pub mod graph;
+
 use gliden64::ViReg;
 use glutin::event::{Event, StartCause, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 use glutin::ContextBuilder;
-use log::{debug, info};
+use graph::{GameState, GameStateEnum, GameStateId};
+use log::{debug, error, info};
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -47,7 +51,7 @@ impl gliden64::GfxCallback for GlideContext {
     }
 }
 
-fn main() {
+fn main() -> anyhow::Result<()> {
     env_logger::init();
 
     info!("main thread");
@@ -82,6 +86,9 @@ fn main() {
     gfx.init().unwrap();
     gfx.open_rom().unwrap();
 
+    let mut state = GameStateEnum::from_id(&GameStateId::TitleSetup);
+    state.init()?;
+
     let mut next_frame_time = std::time::Instant::now();
     el.run(move |event, _, control_flow| {
         let redraw = match event {
@@ -108,10 +115,26 @@ fn main() {
         };
 
         if redraw {
+            state.main().unwrap();
             //gfx.process_dlist();
             gfx.update_screen();
 
             next_frame_time = std::time::Instant::now() + std::time::Duration::from_nanos(16666667);
+        }
+
+        if !state.common().running {
+            let stateid = match state.common().next_stateid {
+                Some(id) => id,
+                None => {
+                    error!("current state stopped without returning a new state");
+                    *control_flow = ControlFlow::Exit;
+                    return;
+                }
+            };
+
+            info!("enter state: {:?}", stateid);
+            state = GameStateEnum::from_id(&stateid);
+            state.init().unwrap();
         }
 
         *control_flow = ControlFlow::WaitUntil(next_frame_time);

@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
+enum_dispatch = "0.3"
 env_logger = "0.9"
 gliden64 = { path = "../gliden64" }
 glutin = "0.28"
