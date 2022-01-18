@@ -54,3 +54,7 @@ graphs/
 
 # Per-user configuration
 .python-version
+
+# Rust
+/target
+/Cargo.lock
