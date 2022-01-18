@@ -1,0 +1,4 @@
+[submodule "gliden64/source"]
+	path = gliden64/source
+	url = https://github.com/M1cha/GLideN64.git
+	branch = lib
