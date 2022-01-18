@@ -3,6 +3,7 @@ use glutin::event::{Event, StartCause, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 use glutin::ContextBuilder;
+use log::{debug, info};
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -22,7 +23,7 @@ impl gliden64::GfxCallback for GlideContext {
     }
 
     fn resize_window(&mut self, width: u32, height: u32) {
-        eprintln!("resize window to {}x{}", width, height);
+        debug!("resize window to {}x{}", width, height);
 
         if !self.rawcontext.as_ref().unwrap().is_current() {
             panic!("not current");
@@ -35,7 +36,7 @@ impl gliden64::GfxCallback for GlideContext {
     }
 
     fn set_video_mode(&mut self, width: u32, height: u32, fullscreen: bool) -> anyhow::Result<()> {
-        eprintln!("set video mode to {}x{} fs:{}", width, height, fullscreen);
+        debug!("set video mode to {}x{} fs:{}", width, height, fullscreen);
 
         self.window
             .lock()
@@ -47,6 +48,10 @@ impl gliden64::GfxCallback for GlideContext {
 }
 
 fn main() {
+    env_logger::init();
+
+    info!("main thread");
+
     let el = EventLoop::new();
     let wb = WindowBuilder::new().with_title("Zelda OOT");
 
@@ -87,7 +92,7 @@ fn main() {
             Event::LoopDestroyed => return,
             Event::WindowEvent { event, .. } => match event {
                 WindowEvent::Resized(physical_size) => {
-                    eprintln!("resized to {:?}", physical_size);
+                    debug!("resized to {:?}", physical_size);
                     gfx.resize_video_output(physical_size.width, physical_size.height);
 
                     false

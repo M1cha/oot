@@ -9,6 +9,7 @@ mod sys {
 use anyhow::anyhow;
 use core::ffi::c_void;
 use lazy_static::lazy_static;
+use log::error;
 use num_traits::cast::ToPrimitive;
 use std::os::raw::c_int;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -95,7 +96,7 @@ extern "C" fn set_video_mode<T: GfxCallback>(
 ) -> c_int {
     let callback = unsafe { (userdata as *mut T).as_mut().unwrap() };
     if let Err(e) = callback.set_video_mode(width as u32, height as u32, fullscreen) {
-        eprintln!("set_video_mode failed: {}", e);
+        error!("set_video_mode failed: {:?}", e);
         return -1;
     }
 
