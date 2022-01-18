@@ -1,0 +1,10 @@
+[package]
+name = "zeldaoot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+gliden64 = { path = "../gliden64" }
+glutin = "0.28"
+winit = "0.26"
