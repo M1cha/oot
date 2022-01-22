@@ -17,6 +17,15 @@ fn main() {
 
     let bindings = bindgen::Builder::default()
         .header("wrapper.h")
+        .clang_arg("-Isource/src")
+        .allowlist_function("InitiateGFX")
+        .allowlist_function("RomOpen")
+        .allowlist_function("RomOpen")
+        .allowlist_function("ProcessDList")
+        .allowlist_function("UpdateScreen")
+        .allowlist_function("ResizeVideoOutput")
+        .allowlist_function("Plugin.*")
+        .allowlist_function("gSP.*")
         .generate()
         .expect("Unable to generate bindings");
 

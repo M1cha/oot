@@ -14,6 +14,11 @@ use num_traits::cast::ToPrimitive;
 use std::os::raw::c_int;
 use std::sync::atomic::{AtomicBool, Ordering};
 
+#[derive(Default)]
+pub struct Mtx {
+    m: [[f32; 4]; 4],
+}
+
 #[derive(num_derive::FromPrimitive, num_derive::ToPrimitive)]
 pub enum MiReg {
     InitMode,
@@ -92,10 +97,10 @@ extern "C" fn set_video_mode<T: GfxCallback>(
     userdata: *mut c_void,
     width: c_int,
     height: c_int,
-    fullscreen: bool,
+    fullscreen: sys::BOOL,
 ) -> c_int {
     let callback = unsafe { (userdata as *mut T).as_mut().unwrap() };
-    if let Err(e) = callback.set_video_mode(width as u32, height as u32, fullscreen) {
+    if let Err(e) = callback.set_video_mode(width as u32, height as u32, fullscreen != 1) {
         error!("set_video_mode failed: {:?}", e);
         return -1;
     }
@@ -165,7 +170,7 @@ impl Gfx {
             CheckInterrupts: Some(check_interrupts),
         };
         let ret = unsafe { sys::InitiateGFX(gfxinfo) };
-        if !ret {
+        if ret != 1 {
             return Err(anyhow!("can't initiate gfx"));
         }
 
@@ -230,5 +235,10 @@ impl Gfx {
 
     pub fn rspmem_mut(&mut self) -> &mut [u8; 0x2000] {
         &mut self.rspmem
+    }
+
+    #[inline]
+    pub fn sp_matrix(&mut self, mtx: &Mtx, param: u8) {
+        unsafe { sys::gSPMatrixNative(&mtx.m as *const [f32; 4] as *mut _, param) }
     }
 }
