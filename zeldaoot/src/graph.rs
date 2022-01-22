@@ -1,5 +1,6 @@
 use crate::gamestates::title::Title;
 use crate::gamestates::title_setup::TitleSetup;
+use crate::GraphicsContext;
 use enum_dispatch::enum_dispatch;
 
 #[derive(Debug, Clone, Copy)]
@@ -29,7 +30,7 @@ impl Default for GameStateCommon {
 #[enum_dispatch(GameStateEnum)]
 pub trait GameState {
     fn init(&mut self) -> anyhow::Result<()>;
-    fn main(&mut self) -> anyhow::Result<()>;
+    fn main(&mut self, gfx_ctx: &mut GraphicsContext) -> anyhow::Result<()>;
 
     fn common(&self) -> &GameStateCommon;
     fn common_mut(&mut self) -> &mut GameStateCommon;

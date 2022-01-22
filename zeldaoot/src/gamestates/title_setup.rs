@@ -1,4 +1,5 @@
 use crate::graph::{GameState, GameStateCommon, GameStateId};
+use crate::GraphicsContext;
 use log::info;
 
 #[derive(Default)]
@@ -25,7 +26,7 @@ impl GameState for TitleSetup {
         Ok(())
     }
 
-    fn main(&mut self) -> anyhow::Result<()> {
+    fn main(&mut self, gfx_ctx: &mut GraphicsContext) -> anyhow::Result<()> {
         Ok(())
     }
 }
