@@ -1,5 +1,6 @@
 use crate::graph::{GameState, GameStateCommon};
 use crate::GraphicsContext;
+use gliden64::{Mtx, Vec3};
 use std::sync::Arc;
 
 #[derive(Default)]
@@ -8,24 +9,6 @@ pub struct Viewport {
     bottom_y: i32,
     left_x: i32,
     right_x: i32,
-}
-
-#[derive(Default)]
-pub struct Vec3f {
-    x: f32,
-    y: f32,
-    z: f32,
-}
-
-impl Vec3f {
-    pub fn new(x: f32, y: f32, z: f32) -> Self {
-        Self { x, y, z }
-    }
-}
-
-#[derive(Default)]
-pub struct Mtx {
-    m: [[i32; 4]; 4],
 }
 
 #[derive(Default)]
@@ -41,19 +24,19 @@ pub struct View {
     z_far: f32,
     /// scale for matrix elements
     scale: f32,
-    eye: Vec3f,
-    look_at: Vec3f,
-    up: Vec3f,
+    eye: Vec3,
+    look_at: Vec3,
+    up: Vec3,
     //Vp     vp;
     projection: Mtx,
     viewing: Mtx,
     //Mtx*   projectionPtr;
     //Mtx*   viewingPtr;
-    unk_e8: Vec3f,
-    unk_f4: Vec3f,
+    unk_e8: Vec3,
+    unk_f4: Vec3,
     unk_100: f32,
-    unk_104: Vec3f,
-    unk_110: Vec3f,
+    unk_104: Vec3,
+    unk_110: Vec3,
     /// used to normalize the projection matrix
     normal: u16,
     flags: i32,
@@ -101,12 +84,9 @@ impl GameState for Title {
     }
 
     fn main(&mut self, gfx_ctx: &mut GraphicsContext) -> anyhow::Result<()> {
+        crate::rcp::func_80095248(gfx_ctx, 0, 0, 0);
         self.calc();
-        self.draw();
-
-        gfx_ctx
-            .work
-            .sp_matrix(Arc::new(gliden64::Mtx::default()), 0);
+        self.draw(gfx_ctx);
 
         Ok(())
     }
@@ -121,10 +101,12 @@ impl Title {
         self.cover_alpha = 0;
     }
 
-    fn draw(&mut self) {
-        let v1 = Vec3f::new(0.0, 0.0, 0.0);
-        let v2 = Vec3f::new(-4949.148, 4002.5417, 4002.5417);
-        let v3 = Vec3f::new(69.0, 69.0, 69.0);
+    fn draw(&mut self, gfx_ctx: &mut GraphicsContext) {
+        let v1 = Vec3::new(0.0, 0.0, 0.0);
+        let v2 = Vec3::new(-4949.148, 4002.5417, 1119.0837);
+        let v3 = Vec3::new(69.0, 69.0, 69.0);
+
+        crate::actor::func_8002eabc(&v1, &v2, &v3, gfx_ctx);
 
         self.title_rot_y = self.title_rot_y.wrapping_add(300);
     }

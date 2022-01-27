@@ -2,4 +2,5 @@
 members = [
     "gliden64",
     "zeldaoot",
+    "zeldaoot-assets",
 ]

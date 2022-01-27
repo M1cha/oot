@@ -25,6 +25,7 @@ fn main() {
         .allowlist_function("UpdateScreen")
         .allowlist_function("ResizeVideoOutput")
         .allowlist_function("Plugin.*")
+        .allowlist_function("gDP.*")
         .allowlist_function("gSP.*")
         .generate()
         .expect("Unable to generate bindings");

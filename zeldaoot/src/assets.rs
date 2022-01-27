@@ -1,6 +1,7 @@
 use log::debug;
 use serde::Deserialize;
 use std::io::BufReader;
+use std::path::{Path, PathBuf};
 
 pub fn deserialize_offset<'de, D, T>(deserializer: D) -> Result<T, D::Error>
 where
@@ -57,14 +58,25 @@ struct File {
 #[derive(Debug, Deserialize)]
 struct Asset {
     #[serde(rename = "File")]
-    file: File,
+    files: Vec<File>,
 }
 
-pub fn load() -> anyhow::Result<()> {
-    let f = std::fs::File::open("assets/xml/textures/nintendo_rogo_static.xml")?;
-    let mut reader = BufReader::new(f);
+fn load_texture(texture: &Texture) -> anyhow::Result<()> {
+    Ok(())
+}
+
+pub fn load(filename: &str) -> anyhow::Result<()> {
+    let basedir = Path::new("assets/xml");
+    let path = basedir.join(filename);
+
+    let f = std::fs::File::open(path)?;
+    let reader = BufReader::new(f);
     let asset: Asset = quick_xml::de::from_reader(reader)?;
 
+    for texture in &asset.files[0].textures {
+        load_texture(texture)?;
+        break;
+    }
     debug!("{:#?}", asset);
 
     Ok(())
